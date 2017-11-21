@@ -1,0 +1,35 @@
+public class WordCountSort{
+  public static class Map extends Mapper<LongWritable, Text, Text,IntWritable>{
+    private Text word = new Text();
+    private static final IntWritable iw = new IntWritable(1);
+    protected void map(LongWritable key , Text value, Context context) throws IOException, IntteruptedException {
+      String line = value.toString();
+      StringTokenizer token = new StringTokenizer(line);
+      while(token.hasMoreTokens()){
+        word.set(token.nextToken());
+        context.write(word,iw);
+      }
+   }
+  }
+  public static class Reduce extends Reducer<Text, IntWritable,Text ,IntWritable>{
+    private IntWritable re = new IntWritable(1);
+    protected void reduce (Text key , Iterable<IntWritable> values , Context context) throws IOException , InterruptedException {
+      int sum = 0;
+      for(IntWritable val : values){
+        sum += val.get();
+      }
+      re.set(sum);
+      context.write(key,re);
+    }
+  }
+  public static void main(String[] args){
+    Configuration conf = new Configuration();
+    Job job = Job.getInstance(conf);
+    job.setJobName("word count");
+    job.setJarByClass(WordCountSort.class);
+    job.setMapperClass(Map.class);
+    job.setReducerClass(Reduce.class);
+    job.setCombinerClass(Reduce.class);
+    FileSystem.addInput
+  }
+}
