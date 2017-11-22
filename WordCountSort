@@ -22,14 +22,23 @@ public class WordCountSort{
       context.write(key,re);
     }
   }
-  public static void main(String[] args){
+  public static void main(String[] args) throws Exception{
     Configuration conf = new Configuration();
+    String[] argsTest = new GenericOptionsParser(conf,args).getRemainingArgs();
+    if(argsTest.length != 2){
+      System.out.println("error please input WordCountSort <input> <output>");
+      System.exit(0);
+    }
     Job job = Job.getInstance(conf);
     job.setJobName("word count");
     job.setJarByClass(WordCountSort.class);
     job.setMapperClass(Map.class);
     job.setReducerClass(Reduce.class);
     job.setCombinerClass(Reduce.class);
-    FileSystem.addInput
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(IntWritable.class);
+    FileInputFormat.addInputPath(job, new Path(argsTest[0]));
+    FileOutputFormat.setOutputPath(job, new Path(argsTest[1]));
+    System.exit(job.waitForCompletion(true) ? 0:1);
   }
 }
